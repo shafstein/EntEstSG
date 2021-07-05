@@ -107,14 +107,15 @@ void EntSys::UpdateF_X(void) {
 	}
 }
 
+double EntSys::TrNormSQ(const mat &s2) {
+	return max(trace(ip * s2 * ip * s2), 0.0);	// for safety >= 0.0
+}
+
 void EntSys::Norms1s2(vec &s1, mat &s2) {
-	double s1norm = norm(s1);
-	double s2norm = sqrt(abs(trace(ip * s2 * ip * s2))); // abs for safety
-	if (s1norm > Min4Norm) {
-		s1 = s1 / s1norm;
-	}
-	if (s2norm > Min4Norm) {
-		s2 = s2 / s2norm;
+	double normfac = sqrt(dot(s1, s1) + TrNormSQ(s2));
+	if (normfac > 0.0) {
+		s1 = s1 / normfac;
+		s2 = s2 / normfac;
 	}
 }
 
@@ -126,7 +127,8 @@ void EntSys::StepForward(double t, const vec &s1, const mat &s2) {
 
 // EntSysCONT
 mat EntSysCONT::Bmat(const mat &A) {
-	return sp * A * isp + isp * A.t() * sp;
+	mat M = sp * A * isp;
+	return M + M.t();  //sp * A * isp + isp * A.t() * sp;
 }
 
 tuple<int, double> EntSysCONT::k0EntEst(const vec &lambda, double cfac) {

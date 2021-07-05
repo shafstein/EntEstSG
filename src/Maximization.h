@@ -4,8 +4,6 @@
 using namespace std;
 using namespace arma;
 
-
-
 // for L,U in Z^n all z in Z^n fulfilling L <= z <= U component-wise
 class ZGrid {
 public:

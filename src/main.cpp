@@ -9,37 +9,37 @@ int main(void) {
 	int NrThreads = 60;
 	wall_clock timer;
 	timer.tic();
-	
+	/*
 		Lorenz sys;
 		umat r_a = MulInds(2, sys.dim);
 		uvec resol = { 500, 50, 100 };
 		EntSysCONT Esys(&sys, r_a, resol, true, NrThreads);
-		int N = 4000;			   // no. iterations
+		int N = 4001;			   // no. iterations
 		double ta = 2.0, tb = 0.0; // t_j=ta/(j+tb)
-		ofstream fout1("./results/LorenzEnt.txt");
-		ofstream fout2("./results/LorenzRes.txt");
-	
-/*
-	BouncingBall sys;
-	umat r_a = MulInds(3, sys.dim);
-	uvec resol = { 1000,1000 };
-	EntSysDISC Esys(&sys, r_a, resol, true, NrThreads);
-	int N = 200;	// no. iterations
-	double ta = 1.0, tb = 0.0;  // t_j=ta/(j+tb)
-	ofstream fout1("./results/BBEnt.txt");
-	ofstream fout2("./results/BBRes.txt");
-*/
+		ofstream fout1("./results/LorenzEntSIAMpaper.txt");
+		ofstream fout2("./results/LorenzResSIAMpaper.txt");
+	*/
 
-/*
-	Henon sys;
-	umat r_a = MulInds(3, sys.dim);
+	BouncingBall sys;
+	umat r_a = MulInds(0, sys.dim);
 	uvec resol = { 1000,1000 };
 	EntSysDISC Esys(&sys, r_a, resol, true, NrThreads);
-	int N = 1000;	// no. iterations
-	double ta = 4.0, tb = 0.0;  // t_j=ta/(j+tb)
-	ofstream fout1("./results/HenonEnt.txt");
-	ofstream fout2("./results/HenonRes.txt");
-*/
+	int N = 41;	// no. iterations
+	double ta = 1.0, tb = 0.0;  // t_j=ta/(j+tb)
+	ofstream fout1("./results/BBEntSIAMpaper.txt");
+	ofstream fout2("./results/BBResSIAMpaper.txt");
+
+
+	/*
+		Henon sys;
+		umat r_a = MulInds(3, sys.dim);
+		uvec resol = { 1000,1000 };
+		EntSysDISC Esys(&sys, r_a, resol, true, NrThreads);
+		int N = 4001;	// no. iterations
+		double ta = 16, tb = 0.0;  // t_j=ta/(j+tb)
+		ofstream fout1("./results/HenonEntSIAMpaper.txt");
+		ofstream fout2("./results/HenonResSIAMpaper.txt");
+	*/
 	int k0, best_k;
 	double MaxVal, EstEnt, bestEstEnt = Infinity;
 	vec cx, s1, best_a;
@@ -49,10 +49,11 @@ int main(void) {
 	fout1.precision(16);
 	fout2.precision(16);
 	timer.tic();
+	double ConvFactor;
 	for (int j = 0; j < N; j++) {
 		tie(MaxVal, cx) = Esys.FindMaximum();
 		tie(s1, s2, k0, EstEnt) = Esys.riem_subg(cx);
-		cout << "itr " << j << ": MaxVal " << MaxVal << ": Ent est " << EstEnt << endl;
+		cout << "itr " << (j + 1) << ": MaxVal " << MaxVal << ": Ent est " << EstEnt << ": k0 " << k0 << endl;
 		fout1 << EstEnt << endl;
 		if (EstEnt < bestEstEnt) {
 			bestEstEnt = EstEnt;
@@ -67,7 +68,7 @@ int main(void) {
 	cout << N << " iterations computed in " << timer.toc() << " s" << endl;
 	fout2 << N << " iterations computed in " << timer.toc() << " sec. : t_j = " << ta << "/(j+" << tb << ")" << endl;
 	fout2 << "Best estimate of Restoration Entropy " << bestEstEnt << endl
-		<< "obtained in iteration " << best_k << " with " << endl
+		<< "obtained in iteration " << (best_k + 1) << " with " << endl
 		<< "a : (pow of x_1, pow of x_2, etc. )  : coefficient " << endl;
 	for (int i = 0; i < Esys.PolyDim; i++) {
 		fout2 << "( ";
@@ -76,7 +77,6 @@ int main(void) {
 		}
 		fout2 << ") : " << best_a(i) << endl;
 	}
-	fout2 << endl
-		<< "p :" << endl;
+	fout2 << endl << "p :" << endl;
 	best_p.raw_print(fout2);
 }
